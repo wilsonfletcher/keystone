@@ -32,6 +32,7 @@ var moduleRoot = (function(_rootPath) {
 
 var Keystone = function() {
 	
+	this.stores = {};
 	this.lists = {};
 	this.paths = {};
 	this._options = {
@@ -168,6 +169,7 @@ keystone.utils = utils;
 keystone.Keystone = Keystone;
 keystone.content = require('./lib/content');
 keystone.List = require('./lib/list');
+keystone.Store = require('./lib/store');
 keystone.Field = require('./fields/types/Type');
 keystone.Field.Types = require('./lib/fieldTypes');
 keystone.View = require('./lib/view');
