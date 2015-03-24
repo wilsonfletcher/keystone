@@ -69,7 +69,7 @@ exports = module.exports = function(req, res) {
 		var sendCSV = function(data) {
 
 			var columns = data.length ? Object.keys(data[0]) : [];
-			res.attachment(req.list.path + '-' + moment().format('YYYYMMDD-HHMMSS') + '.csv')
+			res.attachment(req.list.path + '-' + moment().format('YYYYMMDD-HHMMSS') + '.csv');
 			res.setHeader('Content-Type', 'application/octet-stream');
 
 			csv().from(data).to.options({
@@ -77,7 +77,7 @@ exports = module.exports = function(req, res) {
 				columns: columns,
 				delimiter: keystone.get('csv field delimiter') || ','
 			}).to.string(function(data) {
-				res.end("\ufeff" + data, 'utf-8');
+				res.end('\ufeff' + data, 'utf-8');
 			});
 		};
 

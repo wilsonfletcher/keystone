@@ -15,8 +15,11 @@ var util = require('util'),
 
 function money(list, path, options) {
 	
+	this.currency = options.currency;
+	
 	this._nativeType = Number;
 	this._underscoreMethods = ['format'];
+	this._properties = ['currency'];
 	this._fixedSize = 'small';
 	this._formatString = (options.format === false) ? false : (options.format || '$0,0.00');
 	
@@ -42,6 +45,14 @@ util.inherits(money, super_);
  */
 
 money.prototype.format = function(item, format) {
+	if (this.currency) {
+		try {
+			numeral.language(this.currency, require('numeral/languages/' + this.currency));
+			numeral.language(this.currency);
+		} catch (err) {
+			throw new Error('FieldType.Money: options.currency failed to load.');
+		}
+	}
 	if (format || this._formatString) {
 		return ('number' === typeof item.get(this.path)) ? numeral(item.get(this.path)).format(format || this._formatString) : '';
 	} else {
@@ -59,16 +70,20 @@ money.prototype.format = function(item, format) {
  */
 
 money.prototype.validateInput = function(data, required, item) {
-
-	if (!(this.path in data) && item && (item.get(this.path) || item.get(this.path) === 0)) return true;
-
-	if (data[this.path]) {
-		var newValue = utils.number(data[this.path]);
+	
+	var value = this.getValueFromData(data);
+	
+	if (value === undefined && item && (item.get(this.path) || item.get(this.path) === 0)) {
+		return true;
+	}
+	
+	if (value !== undefined) {
+		var newValue = utils.number(value);
 		return (!isNaN(newValue));
 	} else {
 		return (required) ? false : true;
 	}
-
+	
 };
 
 
@@ -79,12 +94,15 @@ money.prototype.validateInput = function(data, required, item) {
  */
 
 money.prototype.updateItem = function(item, data) {
-
-	if (!(this.path in data))
+	
+	var value = this.getValueFromData(data);
+	
+	if (value === undefined) {
 		return;
-
-	var newValue = utils.number(data[this.path]);
-
+	}
+	
+	var newValue = utils.number(value);
+	
 	if (!isNaN(newValue)) {
 		if (newValue !== item.get(this.path)) {
 			item.set(this.path, newValue);
@@ -92,7 +110,7 @@ money.prototype.updateItem = function(item, data) {
 	} else if ('number' === typeof item.get(this.path)) {
 		item.set(this.path, null);
 	}
-
+	
 };
 
 
