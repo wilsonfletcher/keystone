@@ -132,25 +132,35 @@ var Header = React.createClass({
 	renderInfo: function() {
 		return (
 			<ul className="item-toolbar-info">
-				{this.renderKeyOrId()}
+				{this.renderKeyOrIdListItem()}
 				{this.renderCreateButton()}
 			</ul>
 		);
 	},
-	
-	renderKeyOrId: function() {
+
+	renderKeyOrId: function () {
 		var list = this.props.list;
 		if (list.autokey && this.props.data[list.autokey.path]) {
 			return (
-				<li>
-					<AltText
-						normal={list.autokey.path + ': ' + this.props.data[list.autokey.path]}
-						modified={'id: ' + this.props.data.id}
-					/>
-				</li>	
+				<AltText
+					normal={list.autokey.path + ': ' + this.props.data[list.autokey.path]}
+					modified={'id: ' + this.props.data.id} />
 			);
 		}
-		return <li>id: {this.props.data.id}</li>;
+		return <span>id: {this.props.data.id}</span>;
+	},
+	
+	renderKeyOrIdListItem: function() {
+		var list = this.props.list;
+		var content = '';
+		if (this.props.data.weburl) {
+			return (
+				<li>
+					<a href={this.props.data.weburl} target="_blank" title={'View '+list.singular}>{this.renderKeyOrId()}</a>
+				</li>
+			);
+		}
+		return <li>{this.renderKeyOrId()}</li>;
 	},
 	
 	renderCreateButton: function() {
