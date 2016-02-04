@@ -1,6 +1,6 @@
 var React = require('react/addons'),
 	ReactCSSTransitionGroup = React.addons.CSSTransitionGroup,
-	AltText = require('./AltText');
+	AltText = require('react-alt-text');
 
 var Header = React.createClass({
 	
@@ -46,6 +46,7 @@ var Header = React.createClass({
 	
 	renderDrilldown: function() {
 		if (this.state.searchIsVisible) return null;
+		/* eslint-disable no-script-url */
 		return (
 			<ul className="item-breadcrumbs" key="drilldown">
 				<li>
@@ -56,12 +57,13 @@ var Header = React.createClass({
 				{this.renderDrilldownItems()}
 			</ul>
 		);
+		/* eslint-enable */
 	},
 	
 	renderDrilldownItems: function() {
 		
-		var list = this.props.list,
-			items = this.props.drilldown.items;
+		var list = this.props.list;
+		var items = this.props.data.drilldown ? this.props.data.drilldown.items : [];
 		
 		var els = items.map(function(dd) {
 			
@@ -70,7 +72,7 @@ var Header = React.createClass({
 			dd.items.forEach(function(el, i) {
 				links.push(<a key={'dd' + i} href={el.href} title={dd.list.singular}>{el.label}</a>);
 				if (i < dd.items.length - 1) {
-					links.push(<span key={'ds' + i} className="separator">,</span>);
+					links.push(<span key={'ds' + i} className="separator">,</span>);//eslint-disable-line comma-spacing
 				}
 			});
 			
@@ -173,6 +175,7 @@ var Header = React.createClass({
 				</a>
 			</li>
 		);
+		/* eslint-enable */
 	},
 	
 	render: function() {
