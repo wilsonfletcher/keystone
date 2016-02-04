@@ -1,7 +1,6 @@
 var Select = require('react-select'),
 	React = require('react'),
 	Field = require('../Field'),
-	Note = require('../../components/Note'),
 	superagent = require('superagent'),
 	_ = require('underscore');
 
@@ -62,13 +61,13 @@ module.exports = Field.create({
 				value: input
 			});
 			superagent
-				.get('/keystone/api/' + self.props.refList.path + '/get?dataset=simple&id=' + input)
+				.get('/keystone/api/' + self.props.refList.path + '/' + input + '?simple')
 				.set('Accept', 'application/json')
 				.end(function (err, res) {
 					if (err) throw err;
 					
 					var value = res.body;
-					_.findWhere(expandedValues, {value: value.id}).label = value.name;
+					_.findWhere(expandedValues, { value: value.id }).label = value.name;
 
 					callbackCount++;
 					if (callbackCount === inputs.length) {
@@ -82,7 +81,7 @@ module.exports = Field.create({
 		var filters = {};
 		
 		_.each(this.props.filters, function(value, key) {
-			if(_.isString(value) && value[0] == ':') {
+			if(_.isString(value) && value[0] == ':') {//eslint-disable-line eqeqeq
 				var fieldName = value.slice(1);
 
 				var val = this.props.values[fieldName];
@@ -111,7 +110,7 @@ module.exports = Field.create({
 	},
 
 	buildOptionQuery: function (input) {
-		return  'context=relationship&q=' + input +
+		return 'context=relationship&q=' + input +
 				'&list=' + Keystone.list.path +
 				'&field=' + this.props.path +
 				'&' + this.buildFilters();

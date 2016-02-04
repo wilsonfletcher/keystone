@@ -1,77 +1,47 @@
-/*!
- * Module dependencies.
- */
-
-var util = require('util'),
-  _ = require('underscore'),
-	utils = require('keystone-utils'),
-	super_ = require('../Type');
+var FieldType = require('../Type');
+var util = require('util');
+var utils = require('keystone-utils');
 
 /**
  * Text FieldType Constructor
  * @extends Field
  * @api public
  */
-
 function text(list, path, options) {
 	this._nativeType = String;
 	this._underscoreMethods = ['crop'];
-
-  this._properties = ['maxLen'];
-
-  // if max option, set maxLen
-  this.maxLen = null;
-  if (options.max) {
-    this.maxLen = { chars: 255, mode: 'limit' };
-    if (typeof options.max !== 'object') {
-      this.maxLen.chars = +options.max;
-    } else {
-      _.assign(this.maxLen, options.max);
-    }
-  }
-
 	text.super_.call(this, list, path, options);
 }
-
-/*!
- * Inherit from Field
- */
-
-util.inherits(text, super_);
-
+util.inherits(text, FieldType);
 
 /**
- * Validates that length is within the max range
- *
- * @api public
+ * Add filters to a query
  */
-
-text.prototype.validateInput = function(data, required, item) {
-  var validateMax = this.maxLen && this.maxLen.mode == 'limit';
-  if (!required && !validateMax) return true;
-  var value = this.getValueFromData(data);
-  if (value === undefined && item && item.get(this.path)) return true;
-  if(validateMax) {
-    return data[this.path].length <= this.maxLen.chars;
-  } else {
-    return (data[this.path].trim()) ? true : false;
-  }
+text.prototype.addFilterToQuery = function(filter, query) {
+	query = query || {};
+	if (filter.mode === 'match' && !filter.value) {
+		query[this.path] = filter.invert ? { $nin: ['', null] } : { $in: ['', null] };
+		return;
+	}
+	var value = utils.escapeRegExp(filter.value);
+	if (filter.mode === 'startsWith') {
+		value = '^' + value;
+	} else if (filter.mode === 'endsWith') {
+		value = value + '$';
+	} else if (filter.mode === 'match') {
+		value = '^' + value + '$';
+	}
+	value = new RegExp(value, filter.caseSensitive ? '' : 'i');
+	query[this.path] = filter.invert ? { $not: value } : value;
+	return query;
 };
-
 
 /**
  * Crops the string to the specifed length.
- *
- * @api public
  */
-
 text.prototype.crop = function(item, length, append, preserveWords) {
 	return utils.cropString(item.get(this.path), length, append, preserveWords);
 };
 
-
-/*!
- * Export class
- */
-
+/* Export Field Type */
 exports = module.exports = text;

@@ -53,30 +53,14 @@ var Base = module.exports.Base = {
 	},
 	
 	renderField: function() {
-		var max = this.props.maxLen,
-				value = this.props.value || '',
-				counter;
-
-		if (max) {
-			var len = value.length
-					counterClassName = cx('field-max-counter', len > max.chars ? 'do-' + max.mode : '');
-			counter = (
-				<div className={counterClassName}>
-					{ max.mode == 'limit' ? max.chars - len : (len > max.chars ? len : '') }
-				</div>
-			);
-		}
-		return [
-			counter,
-			<input type="text" ref="focusTarget" name={this.props.path} placeholder={this.props.placeholder} value={value} onChange={this.valueChanged} autoComplete="off" className="form-control" />
-		];
+		return <input type="text" ref="focusTarget" name={this.props.path} placeholder={this.props.placeholder} value={this.props.value} onChange={this.valueChanged} autoComplete="off" className="form-control" />;
 	},
 	
 	renderValue: function() {
 		return <div className="field-value">{this.props.value}</div>;
 	},
 	
-	renderUI: function(spec) {
+	renderUI: function(spec) {//eslint-disable-line no-unused-vars
 		var wrapperClassName = cx('field', 'field-type-' + this.props.type, this.props.className, { 'field-has-label': this.props.label });
 		var fieldClassName = cx('field-ui', 'field-size-' + this.props.size);
 		return (
@@ -119,6 +103,7 @@ var Mixins = module.exports.Mixins = {
 			if (!this.shouldRenderField()) {
 				return null;
 			}
+			/* eslint-disable no-script-url */
 			return (
 				<div className={'field field-type-' + this.props.type}>
 					<div className="col-sm-12">
@@ -128,6 +113,7 @@ var Mixins = module.exports.Mixins = {
 					</div>
 				</div>
 			);
+			/* eslint-enable */
 		}
 	}
 };
